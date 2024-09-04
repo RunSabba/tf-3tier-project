@@ -58,7 +58,7 @@ resource "aws_s3_bucket_policy" "state_bucket_policy" {
 #creating db table for state locking
 resource "aws_dynamodb_table" "state_lock_table" {
     name = var.table_name
-    billing_mode = PAY_PER_REQUEST
+    billing_mode = "PAY_PER_REQUEST"
     hash_key = "LockID"
 
     attribute {

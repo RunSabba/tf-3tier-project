@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket = var.state_bucket
-    key = "backend/tf-2tier-tfstate"
-    region = "us-east-1"
-    dynamodb_table = var.table_name
-    encrypt = true    
+    bucket         = "2tier-state-bucket-runsabba"
+    key            = "backend/tf-2tier-tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "2tier-state-lock-table"
+    encrypt        = true
   }
 } 

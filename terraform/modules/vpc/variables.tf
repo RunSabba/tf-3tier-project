@@ -1,6 +1,3 @@
-variable "company_name" {
-    description = "ill add to tags of all the resources in the VPC"
-}
 variable "vpc_cidr" {
     description = "CIDR Block"
 }
