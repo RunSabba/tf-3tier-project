@@ -25,6 +25,8 @@ module "vpc" {
   public_subnet_2  = var.public_subnet_2
   private_subnet_1 = var.private_subnet_1
   private_subnet_2 = var.private_subnet_2
+  az1 = var.az1
+  az2 = var.az2
 }
 
 module "security_groups" {
@@ -59,5 +61,6 @@ module "database" {
   instance_class = var.instance_class
   db_username = var.db_password
   db_password = var.db_password
+  engine_version = var.engine_version
   
 }

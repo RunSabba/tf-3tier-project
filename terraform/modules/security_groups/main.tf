@@ -8,7 +8,7 @@ resource "aws_security_group" "runsabba_ec2_sg" {
     description = "Allow all inbound traffic"
     from_port   = 0
     to_port     = 0
-    protocol    = "-1"
+    protocol    = "-1" #remember that -1 means all protocols (TCP, UDP, ICMP, etc.)
     cidr_blocks = ["0.0.0.0/0"]
   }
 

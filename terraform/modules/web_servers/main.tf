@@ -8,7 +8,7 @@ resource "aws_instance" "web_server_1" {
     tags = {
       Name = "Runsabba-Web-Server-1"
     }
-
+#bash script to install updates,install and start ngnix and writes html page and write to the index.html file
   user_data = <<-EOF
 #!/bin/bash
 sudo apt update
@@ -40,19 +40,4 @@ sudo systemctl enable nginx
 sudo systemctl start nginx
 echo "<html><body><h1>Hello from RunSabba Web Server 2!</h1></body></html>" | sudo tee /var/www/html/index.html
 EOF
-}
-
-#Elastic IP's for web servers
-resource "aws_eip" "web_server_1_eip" {
-    vpc = true
-
-    instance = aws_instance.web_server_1.id
-    depends_on = [var.runsabba_gateway]
-}
-
-resource "aws_eip" "web_server_2_eip" {
-    vpc = true
-    instance = aws_instance.web_server_2.id
-    depends_on = [var.runsabba_gateway]
-  
-}
+} 

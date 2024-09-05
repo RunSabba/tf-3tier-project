@@ -1,4 +1,6 @@
 variable "region" {}
+variable "az1" {}
+variable "az2" {}
 variable "username" {}
 variable "state_bucket" {}
 variable "table_name" {}
@@ -13,6 +15,4 @@ variable "key_name" {}
 variable "instance_class" {}
 variable "db_username" {}
 variable "db_password" {}
-variable "engine_version" {
-  
-}
+variable "engine_version" {}
