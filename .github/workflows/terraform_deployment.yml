@@ -18,8 +18,8 @@
             TF_VAR_table_name: ${{ secrets.TF_VAR_TABLE_NAME}}
 
            defaults:
-                run:
-                    working-directory: ./terraform
+               run:
+                   working-directory: ./terraform
 
            steps:
               -  name: Checkout Repo
@@ -40,7 +40,7 @@
                  run: terraform validate
                 
               -  name: Terraform Plan
-                 run: terraform plan -lock-timeout 60s -detailed-exitcode -debug #issues being stuck on tf plan for over 5 minutes. using to trace issue.
+                 run: terraform plan -lock-timeout 60s -detailed-exitcode -out=tfplan #issues being stuck on tf plan for over 5 minutes. using to trace issue.
                 
               -  name: Terraform Apply
-                 run: terraform apply -auto-approve -lock-timeout=60s -debug #issues being stuck on tf plan for over 5 minutes. using to trace issue.
+                 run: terraform apply -auto-approve -lock-timeout=60s #issues being stuck on tf plan for over 5 minutes. using to trace issue.
