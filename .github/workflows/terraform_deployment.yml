@@ -17,6 +17,7 @@ jobs:
             TF_VAR_username: ${{ secrets.TF_VAR_USERNAME}}
             TF_VAR_state_bucket: ${{ secrets.TF_VAR_STATE_BUCKET}}
             TF_VAR_table_name: ${{ secrets.TF_VAR_TABLE_NAME}}
+            TF_VAR_ami: ${{ secrets.TF_VAR_AMI}}
 
         defaults:
             run:
