@@ -20,9 +20,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Create tfvars file
-        run: echo "${{ secrets.TFVARS_FILE }}" > terraform/terraform.tfvars
+        run: |
+          echo "Creating terraform.tfvars"
+          echo "${{ secrets.TFVARS_FILE }}" > terraform/terraform.tfvars
 
-      - name: Verify Directory Contents
+      - name: Verify tfvars File Creation
         run: |
           echo "Listing directory contents:"
           ls -R terraform
@@ -44,18 +46,6 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: terraform
-
-      - name: Verify tfvars File
-        run: |
-          echo "Checking if terraform.tfvars exists and is readable:"
-          if [ -f terraform/terraform.tfvars ]; then
-            echo "File exists and is readable."
-            cat terraform/terraform.tfvars
-          else
-            echo "File does not exist or is not readable."
-            exit 1
-          fi
         working-directory: terraform
 
       - name: Terraform Plan
