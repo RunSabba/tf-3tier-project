@@ -1,4 +1,4 @@
-name: Deploy 2Tier Architecture
+name: Deploy 2Tier Arch
 
 on:
   push:
@@ -7,54 +7,48 @@ on:
 
 jobs:
   terraform:
-    name: Deploy Infrastructure
     runs-on: ubuntu-latest
 
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      TF_VAR_region: ${{ secrets.TF_VAR_REGION }}
-
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Create tfvars file
-        run: |
-          echo "Creating terraform.tfvars"
-          echo "${{ secrets.TFVARS_FILE }}" > terraform/terraform.tfvars
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.6.0
 
-      - name: Verify tfvars File Creation
-        run: |
-          echo "Listing directory contents:"
-          ls -R terraform
-          echo "Displaying terraform.tfvars file content:"
-          cat terraform/terraform.tfvars
+    - name: Verify directory contents
+      run: |
+        echo "Listing directory contents:"
+        ls -R terraform
+        echo "Displaying terraform.tfvars file content:"
+        cat terraform/terraform.tfvars
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TF_VAR_region: ${{ secrets.TF_VAR_region }}
 
-      - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.8.5
+    - name: Format Terraform code
+      run: terraform fmt
+      working-directory: terraform
 
-      - name: Terraform Format
-        run: terraform fmt
-        working-directory: terraform
+    - name: Initialize Terraform
+      run: terraform init
+      working-directory: terraform
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform
+    - name: Validate Terraform configuration
+      run: terraform validate
+      working-directory: terraform
 
-      - name: Terraform Validate
-        run: terraform validate
-        working-directory: terraform
+    - name: Plan Terraform changes
+      run: terraform plan -var-file="terraform/terraform.tfvars" -out=tfplan
+      working-directory: terraform
 
-      - name: Terraform Plan
-        run: terraform plan -var-file="terraform/terraform.tfvars" -out=tfplan
-        working-directory: terraform
+    - name: Apply Terraform changes
+      run: terraform apply -var-file="terraform/terraform.tfvars" -auto-approve
+      working-directory: terraform
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file="terraform/terraform.tfvars"
-        working-directory: terraform
 
 
                  #2024-09-06T00:16:47.748Z [DEBUG] backend/local: will prompt for input of unset required variables [public_subnet_1 public_subnet_2 az1 vpc_cidr private_subnet_2 ami engine_version private_subnet_1 instance_type db_username db_password az2 key_name instance_class]
