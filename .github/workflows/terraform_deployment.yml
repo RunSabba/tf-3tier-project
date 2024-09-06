@@ -1,54 +1,66 @@
-name: Deploy 2Tier Arch
-
+name: Terraform Infrastructure Deployment
 on:
   push:
     branches:
       - main
 
-jobs:
+jobs: 
   terraform:
-    runs-on: ubuntu-latest
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest    
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    defaults:
+      run:
+        working-directory: ./terraform
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        #Script to create my TF.vars file and keep mine out the repo
+      - name: Create terraform.tfvars
+        run: |
+          cat << EOF > terraform.tfvars
+          username = "2tier_user"
+          state_bucket = "2tier-state-bucket-runsabba"
+          table_name = "2tier-state-lock-table"
+          region = "us-east-1"
+          az1 = "us-east-1a"
+          az2 = "us-east-1b"
+          vpc_cidr = "10.0.0.0/16"
+          public_subnet_1 = "10.0.0.0/18"
+          public_subnet_2 = "10.0.64.0/18"
+          private_subnet_1 = "10.0.128.0/18"
+          private_subnet_2 = "10.0.192.0/18"
+          ami = "ami-0e86e20dae9224db8"
+          instance_type = "t2.micro"
+          key_name = ${{ secrets.TF_VAR_KEY_NAME}}
+          instance_class = "db.t3.micro"
+          db_username = "runsabba"
+          db_password = "${{ secrets.TF_VAR_DB_PASSWORD }}"
+          engine_version = "5.7.44"
+          EOF
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: 1.6.0
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.8.5
 
-    - name: Verify directory contents
-      run: |
-        echo "Listing directory contents:"
-        ls -R terraform
-        echo "Displaying terraform.tfvars file content:"
-        cat terraform/terraform.tfvars
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        TF_VAR_region: ${{ secrets.TF_VAR_region }}
+      - name: Terraform Init
+        run: terraform init
 
-    - name: Format Terraform code
-      run: terraform fmt
-      working-directory: terraform
+      - name: Terraform Validate
+        run: terraform validate
 
-    - name: Initialize Terraform
-      run: terraform init
-      working-directory: terraform
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
 
-    - name: Validate Terraform configuration
-      run: terraform validate
-      working-directory: terraform
-
-    - name: Plan Terraform changes
-      run: terraform plan -var-file="terraform/terraform.tfvars" -out=tfplan
-      working-directory: terraform
-
-    - name: Apply Terraform changes
-      run: terraform apply -var-file="terraform/terraform.tfvars" -auto-approve
-      working-directory: terraform
-
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve tfplan
 
 
                  #2024-09-06T00:16:47.748Z [DEBUG] backend/local: will prompt for input of unset required variables [public_subnet_1 public_subnet_2 az1 vpc_cidr private_subnet_2 ami engine_version private_subnet_1 instance_type db_username db_password az2 key_name instance_class]
