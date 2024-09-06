@@ -40,7 +40,9 @@
                  run: terraform validate
                 
               -  name: Terraform Plan
-                 run: terraform plan -lock-timeout 120s -detailed-exitcode -out=tfplan #issues being stuck on tf plan for over 5 minutes. using to trace issue.
+                 run: |
+                  export TF_LOG=DEBUG
+                  terraform plan -lock-timeout 120s -detailed-exitcode -out=tfplan #issues being stuck on tf plan for over 5 minutes. using to trace issue.
                 
               -  name: Terraform Apply
                  run: terraform apply -auto-approve -lock-timeout=120s #issues being stuck on tf plan for over 5 minutes. using to trace issue.
