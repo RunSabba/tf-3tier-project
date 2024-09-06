@@ -25,6 +25,9 @@
               - name: Create tfvars file
                 run: |
                    echo "${{ secrets.TFVARS_FILE }}" > terraform.tfvars
+                  
+              - name: Print tfvars file
+                run: cat terraform.tfvars       
 
               -  name: Terraform Setup
                  uses: hashicorp/setup-terraform@v1
