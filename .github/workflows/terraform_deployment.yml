@@ -37,7 +37,7 @@ jobs:
           private_subnet_2 = "10.0.192.0/18"
           ami = "ami-0e86e20dae9224db8"
           instance_type = "t2.micro"
-          key_name = ${{ secrets.TF_VAR_KEY_NAME }}
+          key_name = "${{ secrets.TF_VAR_KEY_NAME }}"
           instance_class = "db.t3.micro"
           db_username = "runsabba"
           db_password = "${{ secrets.TF_VAR_DB_PASSWORD }}"
