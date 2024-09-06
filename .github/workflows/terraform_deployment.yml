@@ -20,7 +20,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Create tfvars file
-        run: echo "${{ secrets.TFVARS_FILE }}" > terraform.tfvars
+        run: echo "${{ secrets.TFVARS_FILE }}" > terraform/terraform.tfvars
+
+      - name: Verify Directory Contents #GHA keeps removing the "" on my variables which keeps causing action to fail
+        run: |
+          echo "Listing directory contents:"
+          ls -R terraform
+          echo "Displaying terraform.tfvars file content:"
+          cat terraform/terraform.tfvars
 
       - name: Terraform Setup
         uses: hashicorp/setup-terraform@v1
@@ -29,18 +36,23 @@ jobs:
 
       - name: Terraform Format
         run: terraform fmt
+        working-directory: terraform
 
       - name: Terraform Init
         run: terraform init
+        working-directory: terraform
 
       - name: Terraform Validate
         run: terraform validate
+        working-directory: terraform
 
       - name: Terraform Plan
-        run: terraform plan -var-file="terraform.tfvars" -out=tfplan
+        run: terraform plan -var-file="terraform/terraform.tfvars" -out=tfplan
+        working-directory: terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file="terraform.tfvars"
+        run: terraform apply -auto-approve -var-file="terraform/terraform.tfvars"
+        working-directory: terraform
 
                  #2024-09-06T00:16:47.748Z [DEBUG] backend/local: will prompt for input of unset required variables [public_subnet_1 public_subnet_2 az1 vpc_cidr private_subnet_2 ami engine_version private_subnet_1 instance_type db_username db_password az2 key_name instance_class]
 ###2024-09-06T00:16:47.749Z [DEBUG] command: asking for input: "var.ami"
