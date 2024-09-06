@@ -1,55 +1,50 @@
- name: Terraform Infrastructure Deployment
- on:
-    push:
-        branches:
-            - main
+name: Terraform Infrastructure Deployment
+on:
+  push:
+    branches:
+      - main
 
- jobs: 
-    terraform:
-           name: Deploy Infrastructure
-           runs-on: ubuntu-latest    
+jobs:
+  terraform:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
 
-           env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-           defaults:
-               run:
-                   working-directory: ./terraform
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
 
-           steps:
-              -  name: Checkout Repo
-                 uses: actions/checkout@v2
+      - name: Create tfvars file
+        run: |
+          printf "%s" "${{ secrets.TFVARS_FILE }}" > terraform.tfvars
 
-              - name: Create tfvars file
-                run: |
-                   echo "${{ secrets.TFVARS_FILE }}" > terraform.tfvars
-                  
-              - name: Print tfvars file
-                run: cat terraform.tfvars       
+      - name: Verify tfvars file content
+        run: cat terraform.tfvars
 
-              -  name: Terraform Setup
-                 uses: hashicorp/setup-terraform@v1
-                 with:
-                    terraform_version: 1.8.5
-                
-              -  name: Terraform Format
-                 run: terraform fmt
-                
-              -  name: Terraform Init
-                 run: terraform init
-                
-              -  name: Terraform Validate
-                 run: terraform validate
-                #issues being stuck on tf plan for over 5 minutes. using to trace issue.               
-              -  name: Terraform Plan
-                 run: |
-                  export TF_LOG=DEBUG && \
-                  terraform plan -var-file="terraform.tfvars" -lock-timeout 60s -detailed-exitcode -out=tfplan 
-              -  name: Terraform Apply
-                 run: terraform apply -auto-approve -var-file="terraform.tfvars" -lock-timeout 60s 
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.8.5
 
+      - name: Terraform Format
+        run: terraform fmt
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: |
+          export TF_LOG=DEBUG && \
+          terraform plan -var-file="terraform.tfvars" -lock-timeout 60s -detailed-exitcode -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var-file="terraform.tfvars" -lock-timeout 60s
 
                  #2024-09-06T00:16:47.748Z [DEBUG] backend/local: will prompt for input of unset required variables [public_subnet_1 public_subnet_2 az1 vpc_cidr private_subnet_2 ami engine_version private_subnet_1 instance_type db_username db_password az2 key_name instance_class]
 ##2024-09-06T00:16:47.749Z [DEBUG] command: asking for input: "var.ami"
