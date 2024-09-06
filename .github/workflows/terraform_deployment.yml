@@ -22,7 +22,7 @@ jobs:
       - name: Create tfvars file
         run: echo "${{ secrets.TFVARS_FILE }}" > terraform/terraform.tfvars
 
-      - name: Verify Directory Contents #GHA keeps removing the "" on my variables which keeps causing action to fail
+      - name: Verify Directory Contents
         run: |
           echo "Listing directory contents:"
           ls -R terraform
@@ -46,6 +46,18 @@ jobs:
         run: terraform validate
         working-directory: terraform
 
+      - name: Verify tfvars File
+        run: |
+          echo "Checking if terraform.tfvars exists and is readable:"
+          if [ -f terraform/terraform.tfvars ]; then
+            echo "File exists and is readable."
+            cat terraform/terraform.tfvars
+          else
+            echo "File does not exist or is not readable."
+            exit 1
+          fi
+        working-directory: terraform
+
       - name: Terraform Plan
         run: terraform plan -var-file="terraform/terraform.tfvars" -out=tfplan
         working-directory: terraform
@@ -53,6 +65,7 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve -var-file="terraform/terraform.tfvars"
         working-directory: terraform
+
 
                  #2024-09-06T00:16:47.748Z [DEBUG] backend/local: will prompt for input of unset required variables [public_subnet_1 public_subnet_2 az1 vpc_cidr private_subnet_2 ami engine_version private_subnet_1 instance_type db_username db_password az2 key_name instance_class]
 ###2024-09-06T00:16:47.749Z [DEBUG] command: asking for input: "var.ami"
