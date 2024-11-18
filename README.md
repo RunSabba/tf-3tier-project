@@ -7,7 +7,7 @@ Welcome to my Terraform project repository! 🚀
 
 ## Project Overview
 
-I'm currently working on a **2-Tier Architecture** using Terraform to solidify my skills in Infrastructure as Code (IaC). This project includes:
+I'm currently working on a **3-Tier Architecture** using Terraform to solidify my skills in Infrastructure as Code (IaC). This project includes:
 
 - **Terraform** for provisioning and managing infrastructure
 - **GitHub Actions** for Continuous Integration and Continuous Deployment (CI/CD)
@@ -39,7 +39,7 @@ To get started with this project, follow these steps:
 
 ## Project Goals
 
-- 📦 **Provision a robust 2-tier architecture**: Using Terraform to manage resources efficiently.
+- 📦 **Provision a robust 3-tier architecture**: Using Terraform to manage resources efficiently.
 - 🔄 **Implement CI/CD**: Automate testing and deployment with GitHub Actions to ensure seamless and reliable updates.
 
 ## Contact
