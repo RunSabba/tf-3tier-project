@@ -9,6 +9,14 @@ output "runsabba_public_2_id" {
     value = aws_subnet.runsabba_public_2.id  
 }
 
+output "runsabba_public_1_cidr" {
+    value = aws_subnet.runsabba_public_1.cidr_block  
+}
+
+output "runsabba_public_2_cidr" {
+    value = aws_subnet.runsabba_public_2.cidr_block
+}
+
 output "runsabba_private_1_id" {
     value = aws_subnet.runsabba_private_1.id
 }

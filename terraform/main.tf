@@ -32,6 +32,8 @@ module "vpc" {
 module "security_groups" {
   source     = "./modules/security_groups"
   aws_vpc_id = module.vpc.aws_vpc_id
+  public_1_cidr = module.vpc.runsabba_public_1_cidr
+  public_2_cidr = module.vpc.runsabba_public_2_cidr
 }
 
 module "load_balancer" {

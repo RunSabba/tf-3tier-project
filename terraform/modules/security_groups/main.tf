@@ -5,17 +5,17 @@ resource "aws_security_group" "runsabba_ec2_sg" {
   vpc_id      = var.aws_vpc_id
 
   ingress {
-    description = "Allow all inbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1" #remember that -1 means all protocols (TCP, UDP, ICMP, etc.)
+    description = "Allow HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description = "Allow HTTP"
-    from_port   = 80
-    to_port     = 80
+    description = "Allow HTTPS"
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -25,6 +25,14 @@ resource "aws_security_group" "runsabba_ec2_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] #best practice would be your company network IP
+  }
+
+  ingress {
+    description = "Allow ICMP"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp" #ts purposes. traceRT,ping etc.
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -48,10 +56,18 @@ resource "aws_security_group" "lb_security_group" {
   description = "Application load balancer security group"
 
   ingress {
-    description = "Allow all inbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "Allow all HTTP traffic"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = " Allow all HTTPS traffic"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -87,7 +103,7 @@ resource "aws_security_group" "db_security_group" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"]
+    security_groups = [aws_security_group.runsabba_ec2_sg.id]
   }
 
   egress {
@@ -95,7 +111,7 @@ resource "aws_security_group" "db_security_group" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.public_1_cidr, var.public_2_cidr] #can only send oubound traffic to webserver subnets
   }
 
   tags = {
